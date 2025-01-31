@@ -1,0 +1,40 @@
+{
+  "id": "08bf08e2-7938-4099-bc8e-3e307f6077ba",
+  "name": "Customize Module E-TAX on D365BCV25",
+  "publisher": "Bigwork Co., Ltd.",
+  "version": "25.25.0130.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "420c8b70-9897-492e-acab-c950c06f4775",
+      "name": "Bigwork Thai Localized on D365BCV25",
+      "publisher": "Bigwork Co., Ltd.",
+      "version": "25.25.129.0"      
+    }
+  ],
+  "screenshots": [],
+  "platform": "1.0.0.0",
+  "application": "25.0.0.0",
+  "idRanges": [
+    {
+      "from": 94000,
+      "to": 94020
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": false,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "14.0",
+  "target": "OnPrem",
+  "features": [
+    "NoImplicitWith"
+  ]
+}

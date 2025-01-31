@@ -1,0 +1,10 @@
+{
+    "todo-tree.tree.showScanModeButton": false,
+    "workbench.colorTheme": "Visual Studio Dark",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "al.assemblyProbingPaths": [
+        "./.netpackages",
+        "C:/Windows/assembly/"
+    ],
+    "editor.accessibilitySupport": "off"
+}
