@@ -60,7 +60,7 @@ codeunit 94000 "BWK E-Tax Function Center"
 
     end;
 
-    procedure "Export Text File"(Var EtaxLine: Record "BWK E-Tax Line")
+    procedure "Export Text File"(Var EtaxLine: Record "BWK E-Tax Line"): Boolean
     var
         Cust: Record Customer;
         SaleINVH: Record "Sales Invoice Header";
@@ -163,10 +163,12 @@ codeunit 94000 "BWK E-Tax Function Center"
             SELLER_BRANCH_ID := CompanyInfo."Bank Branch No.";
 
             // Start AGE-WE-TAX - File Control
-            TextFile.Write('"C"' + ',' //C1.DATA_TYPE (M)
+            TextFile.Write(
+                '"C"' + ',' //C1.DATA_TYPE (M)
                 + '"' + SELLER_TAX_ID + '"' + ',' //C2.SELLER_TAX_ID (M)
                 + '"' + SELLER_BRANCH_ID + '"' + ',' //C3.SELLER_BRANCH_ID (M)
-                + '"' + FILE_NAME + '"'); //C4.FILE_NAME (O)
+                + '"' + FILE_NAME + '"' //C4.FILE_NAME (O)
+            );
             // End AGE-WE-TAX - File Control
 
             Cust.Reset();
@@ -198,7 +200,8 @@ codeunit 94000 "BWK E-Tax Function Center"
                                 //     SEND_EMAIL := 'Y';
 
                                 // E-TAX | Document Header
-                                TextFile.Write(CRLF + '"H"' + ',' //H1.DATA_TYPE (M)
+                                TextFile.Write(CRLF
+                                    + '"H"' + ',' //H1.DATA_TYPE (M)
                                     + '"T02"' + ',' //H2.DOCUMENT_TYPE_CODE (M)
                                     + '"ใบแจ้งหนี้/ใบกำกับภาษี"' + ',' //H3.DOCUMENT_NAME (C)
                                     + '"' + DOCUMENT_ID + '"' + ',' //H4.DOCUMENT_ID (M)
@@ -224,7 +227,8 @@ codeunit 94000 "BWK E-Tax Function Center"
                                     + '""' + ',' //H24.SOURCE_SYSTEM (O)
                                     + '""' + ',' //H25.ENCRYPT_PASSWORD (O)
                                     + '""' + ',' //H26.PDF_TEMPLATE_ID (O)
-                                    + '"' + SEND_EMAIL + '"'); //H27.SEND_EMAIL (O)
+                                    + '"' + SEND_EMAIL + '"' //H27.SEND_EMAIL (O)
+                                );
                                 // End E-TAX | Document Header
 
                                 Clear(BUYER_ID);
@@ -275,26 +279,227 @@ codeunit 94000 "BWK E-Tax Function Center"
                                 case Cust."BWK Etax Taxpayer Type" of
                                     Cust."BWK Etax Taxpayer Type"::TXID:
                                         begin
-
+                                            BUYER_TAX_ID_TYPE := 'TXID';
+                                        end;
+                                    Cust."BWK Etax Taxpayer Type"::NIDN:
+                                        begin
+                                            BUYER_TAX_ID_TYPE := 'NIDN';
+                                        end;
+                                    Cust."BWK Etax Taxpayer Type"::CCPT:
+                                        begin
+                                            BUYER_TAX_ID_TYPE := 'CCPT';
+                                        end;
+                                    Cust."BWK Etax Taxpayer Type"::OTHR:
+                                        begin
+                                            BUYER_TAX_ID_TYPE := 'OTHR';
+                                            BUYER_TAX_ID := 'N/A';
                                         end;
                                 end;
 
-                                // if Cust."BWK Etax Taxpayer Type" = Cust."BWK Etax Taxpayer Type"::TXID then begin
-                                //     BUYER_TAX_ID_TYPE := 'TXID'
-                                // end else begin
-                                //     if Cust."BWK Etax Taxpayer Type" = Cust."BWK Etax Taxpayer Type"::NIDN then begin
-                                //         BUYER_TAX_ID_TYPE := 'NIDN'
-                                //     end else begin
-                                //         if Cust."BWK Etax Taxpayer Type" = Cust."BWK Etax Taxpayer Type"::CCPT then begin
-                                //             BUYER_TAX_ID_TYPE := 'CCPT'
-                                //         end else begin
-                                //             if Cust."BWK Etax Taxpayer Type" = Cust."BWK Etax Taxpayer Type"::OTHR then begin
-                                //                 BUYER_TAX_ID_TYPE := 'OTHR';
-                                //                 BUYER_TAX_ID := 'N/A';
-                                //             end;
+                                // E-TAX | Buyer Information
+                                TextFile.Write(CRLF
+                                    + '"B"' + ',' //B1.DATA_TYPE (M)
+                                    + '"' + BUYER_ID + '"' + ',' //B2.BUYER_ID (O)
+                                    + '"' + BUYER_NAME + '"' + ',' //B3.BUYER_NAME (O)
+                                    + '"' + BUYER_TAX_ID_TYPE + '"' + ',' //B4.BUYER_TAX_ID_TYPE (O)
+                                    + '"' + BUYER_TAX_ID + '"' + ',' //B5.BUYER_TAX_ID (O)
+                                    + '"' + BUYER_BRANCH_ID + '"' + ',' //B6.BUYER_BRANCH_ID (C)
+                                    + '""' + ',' //B7.BUYER_CONTACT_PERSON_NAME (O)
+                                    + '""' + ',' //B8.BUYER_CONTACT_DEPARTMENT_NAME (O)
+                                    + '"' + BUYER_URIID + '"' + ',' //B9.BUYER_URIID (O)
+                                    + '""' + ',' //B10.BUYER_CONTACT_PHONE_NO (C)
+                                    + '"' + BUYER_POST_CODE + '"' + ',' //B11.BUYER_POST_CODE (O)
+                                    + '"' + BUYER_BUILDING_NAME + '"' + ',' //B12.BUYER_BUILDING_NAME (O)
+                                    + '"' + BUYER_BUILDING_NO + '"' + ',' //B13.BUYER_BUILDING_NO (O)
+                                    + '"' + BUYER_ADDRESS_LINE1 + '"' + ',' //B14.BUYER_ADDRESS_LINE1 (O)
+                                    + '"' + BUYER_ADDRESS_LINE2 + '"' + ',' //B15.BUYER_ADDRESS_LINE2 (O)
+                                    + '"' + BUYER_ADDRESS_LINE3 + '"' + ',' //B16.BUYER_ADDRESS_LINE3 (O)
+                                    + '"' + BUYER_ADDRESS_LINE4 + '"' + ',' //B17.BUYER_ADDRESS_LINE4 (O)
+                                    + '"' + BUYER_ADDRESS_LINE5 + '"' + ',' //B18.BUYER_ADDRESS_LINE5 (O)
+                                    + '"' + BUYER_STREET_NAME + '"' + ',' //B19.BUYER_STREET_NAME (O)
+                                    + '""' + ',' //B20.BUYER_CITY_SUB_DIV_ID (C)
+                                    + '"' + BUYER_CITY_SUB_DIV_NAME + '"' + ',' //B21.BUYER_CITY_SUB_DIV_NAME (O)
+                                    + '""' + ',' //B22.BUYER_CITY_ID (C)
+                                    + '"' + BUYER_CITY_NAME + '"' + ',' //B23.BUYER_CITY_NAME (O)
+                                    + '""' + ',' //B24.BUYER_COUNTRY_SUB_DIV_ID (C)
+                                    + '"' + BUYER_COUNTRY_SUB_DIV_NAME + '"' + ',' //B25.BUYER_COUNTRY_SUB_DIV_NAME (C)
+                                    + '"' + BUYER_COUNTRY_ID + '"' //B26.BUYER_COUNTRY_ID (M)
+                                );
+                                // End E-TAX | Buyer Information
 
+                                SaleINVL.RESET;
+                                SaleINVL.SetRange("Document No.", SaleINVH."No.");
+                                SaleINVL.SetFilter("No.", '<>%1', '');
+                                if SaleINVL.FindFirst() THEN BEGIN
+                                    Clear(TAX_CAL_RATE);
 
+                                    if SaleINVL.FIND('-') then begin
+                                        SaleINVL.CALCSUMS("Amount Including VAT", Amount);
+                                        if (SaleINVL."Amount Including VAT" - SaleINVL.Amount) <> 0 then begin
+                                            TAX_CAL_RATE := '7';
+                                        end else begin
+                                            TAX_CAL_RATE := '0';
+                                        end;
+                                    end;
 
+                                    if SaleINVL.FindSet() then begin
+                                        repeat
+                                            Clear(LINE_ID);
+                                            Clear(PRODUCT_ID);
+                                            Clear(PRODUCT_NAME);
+                                            Clear(PRODUCT_CHARGE_AMOUNT);
+                                            Clear(PRODUCT_QUANTITY);
+                                            Clear(LINE_TAX_CAL_RATE);
+                                            Clear(LINE_BASIS_AMOUNT);
+                                            Clear(LINE_TAX_CAL_AMOUNT);
+                                            Clear(LINE_ALLOWANCE_CHARGE_IND);
+                                            Clear(LINE_ALLOWANCE_ACTUAL_AMOUNT);
+                                            Clear(LINE_ALLOWANCE_REASON);
+                                            Clear(LINE_TAX_TOTAL_AMOUNT);
+                                            Clear(LINE_NET_TOTAL_AMOUNT);
+                                            Clear(LINE_NET_INCLUDE_TAX_TOTAL_AMOUNT);
+
+                                            LINE_ID := DELCHR(Format(SaleINVL."Line No."), '=', ',');
+                                            PRODUCT_ID := SaleINVL."No.";
+                                            PRODUCT_NAME := SaleINVL.Description + SaleINVL."Description 2";
+                                            PRODUCT_CHARGE_AMOUNT := DELCHR(Format(SaleINVL."Unit Price", 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+
+                                            if TAX_CAL_RATE = '7' then begin
+                                                LINE_TAX_CAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT" - SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                            end else begin
+                                                LINE_TAX_CAL_AMOUNT := '0.00';
+                                            end;
+
+                                            if SaleINVL.Quantity < 0 then begin
+                                                PRODUCT_QUANTITY := DELCHR(Format(ABS(SaleINVL.Quantity), 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                                LINE_ALLOWANCE_CHARGE_IND := 'false';
+                                                LINE_ALLOWANCE_REASON := PRODUCT_NAME;
+                                                LINE_BASIS_AMOUNT := '0.00';
+                                                LINE_TAX_CAL_AMOUNT := '0.00';
+                                                LINE_TAX_TOTAL_AMOUNT := '0.00';
+                                                LINE_NET_TOTAL_AMOUNT := '0.00';
+                                                LINE_NET_INCLUDE_TAX_TOTAL_AMOUNT := '0.00';
+                                                LINE_ALLOWANCE_ACTUAL_AMOUNT := DELCHR(Format(ABS(SaleINVL.Amount), 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                            end else begin
+                                                PRODUCT_QUANTITY := DELCHR(Format(SaleINVL.Quantity, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                                LINE_BASIS_AMOUNT := DELCHR(Format(SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                                LINE_TAX_TOTAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT" - SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                                LINE_NET_TOTAL_AMOUNT := DELCHR(Format(SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                                LINE_NET_INCLUDE_TAX_TOTAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT" - SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                                LINE_ALLOWANCE_ACTUAL_AMOUNT := '0.00';
+                                            end;
+
+                                            LINE_TAX_CAL_RATE := DELCHR(Format(SaleINVL."VAT %", 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                            LINE_TAX_TOTAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT" - SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+
+                                            // E-TAX | Trade Line Item Information
+                                            TextFile.Write(CRLF
+                                                + '"L"' + ',' //L1.DATA_TYPE (M)
+                                                + '"' + LINE_ID + '"' + ',' //L2.LINE_ID (M)
+                                                + '"' + PRODUCT_ID + '"' + ',' //L3.PRODUCT_ID (O)
+                                                + '"' + PRODUCT_NAME + '"' + ',' //L4.PRODUCT_NAME (M)
+                                                + '""' + ',' //L5.PRODUCT_DESC (O)
+                                                + '""' + ',' //L6.PRODUCT_BATCH_ID (O)
+                                                + '"2019-01-01T00:00:00+07:00"' + ',' //L7.PRODUCT_EXPIRE_DTM (O)
+                                                + '""' + ',' //L8.PRODUCT_CLASS_CODE (O)
+                                                + '""' + ',' //L9.PRODUCT_CLASS_NAME (O)
+                                                + '""' + ',' //L10.PRODUCT_ORIGIN_COUNTRY_ID (O)
+                                                + '"' + PRODUCT_CHARGE_AMOUNT + '"' + ',' //L11.PRODUCT_CHARGE_AMOUNT (M)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L12.PRODUCT_CHARGE_CURRENCY_CODE (M)
+                                                + '""' + ',' //L13.PRODUCT_ALLOWANCE_CHARGE_IND (O)
+                                                + '"0.00"' + ',' //L14.PRODUCT_ALLOWANCE_ACTUAL_AMOUNT (C)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L15.PRODUCT_ALLOWANCE_ACTUAL_CURRENCY_CODE (C)
+                                                + '""' + ',' //L16.PRODUCT_ALLOWANCE_REASON_CODE (O)
+                                                + '""' + ',' //L17.PRODUCT_ALLOWANCE_REASON (O)
+                                                + '"' + PRODUCT_QUANTITY + '"' + ',' //L18.PRODUCT_QUANTITY (O)
+                                                + '""' + ',' //L19.PRODUCT_UNIT_CODE (O)
+                                                + '"0.00"' + ',' //L20.PRODUCT_QUANTITY_PER_UNIT (O)
+                                                + '"VAT"' + ',' //L21.LINE_TAX_TYPE_CODE (O)
+                                                + '"' + LINE_TAX_CAL_RATE + '"' + ',' //L22.LINE_TAX_CAL_RATE (O)
+                                                + '"' + LINE_BASIS_AMOUNT + '"' + ',' //L23.LINE_BASIS_AMOUNT (O)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L24.LINE_BASIS_CURRENCY_CODE (O)
+                                                + '"' + LINE_TAX_CAL_AMOUNT + '"' + ',' //L25.LINE_TAX_CAL_AMOUNT (O)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L26.LINE_TAX_CAL_CURRENCY_CODE (O)
+                                                + '"' + LINE_ALLOWANCE_CHARGE_IND + '"' + ',' //L27.LINE_ALLOWANCE_CHARGE_IND (O)
+                                                + '"' + LINE_ALLOWANCE_ACTUAL_AMOUNT + '"' + ',' //L28.LINE_ALLOWANCE_ACTUAL_AMOUNT (C)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L29.LINE_ALLOWANCE_ACTUAL_CURRENCY_CODE (C)
+                                                + '""' + ',' //L30.LINE_ALLOWANCE_REASON_CODE (O)
+                                                + '"' + LINE_ALLOWANCE_REASON + '"' + ',' //L31.LINE_ALLOWANCE_REASON (O)
+                                                + '"' + LINE_TAX_TOTAL_AMOUNT + '"' + ',' //L32.LINE_TAX_TOTAL_AMOUNT (O)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L33.LINE_TAX_TOTAL_CURRENCY_CODE (O)
+                                                + '"' + LINE_NET_TOTAL_AMOUNT + '"' + ',' //L34.LINE_NET_TOTAL_AMOUNT (O)
+                                                + '"' + CURRENCY_CODE + '"' + ',' //L35.LINE_NET_TOTAL_CURRENCY_CODE (O)
+                                                + '"' + LINE_NET_INCLUDE_TAX_TOTAL_AMOUNT + '"' + ',' //L36.LINE_NET_INCLUDE_TAX_TOTAL_AMOUNT (O)
+                                                + '"' + CURRENCY_CODE + '"' //L37.LINE_NET_INCLUDE_TAX_TOTAL_CURRENCY_CODE (O)
+                                            );
+                                        // End E-TAX | Trade Line Item Information
+                                        until SaleINVL.Next = 0;
+
+                                        SaleINVL.CALCSUMS(Amount, "Amount Including VAT");
+
+                                        Clear(LINE_TOTAL_COUNT);
+                                        Clear(BASIS_AMOUNT);
+                                        Clear(TAX_CAL_AMOUNT);
+                                        Clear(ORIGINAL_TOTAL_AMOUNT);
+                                        Clear(TAX_BASIS_TOTAL_AMOUNT);
+                                        Clear(TAX_TOTAL_AMOUNT);
+                                        Clear(GRAND_TOTAL_AMOUNT);
+
+                                        LINE_TOTAL_COUNT := DELCHR(Format(SaleINVL.Count), '=', ',');
+                                        BASIS_AMOUNT := DELCHR(Format(SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                        TAX_CAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT" - SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                        ORIGINAL_TOTAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT", 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                        TAX_BASIS_TOTAL_AMOUNT := DELCHR(Format(SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                        TAX_TOTAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT" - SaleINVL.Amount, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+                                        GRAND_TOTAL_AMOUNT := DELCHR(Format(SaleINVL."Amount Including VAT", 0, '<Precision,2><sign><Integer Thousand><Decimals,3>'), '=', ',');
+
+                                        // E-TAX |Document Footer
+                                        TextFile.Write(CRLF + '"F"' + ',' //F1.DATA_TYPE (M)
+                                            + '"' + LINE_TOTAL_COUNT + '"' + ',' //F2.LINE_TOTAL_COUNT (M)
+                                            + '"0001-01-01T00:00:00Z"' + ',' //F3.DELIVERY_OCCUR_DTM (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F4.INVOICE_CURRENCY_CODE (O)
+                                            + '"VAT"' + ',' //F5.TAX_TYPE_CODE (O)
+                                            + '"' + TAX_CAL_RATE + '"' + ',' //F6.TAX_CAL_RATE (O)
+                                            + '"' + BASIS_AMOUNT + '"' + ',' //F7.BASIS_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F8.BASIS_CURRENCY_CODE (O)
+                                            + '"' + TAX_CAL_AMOUNT + '"' + ',' //F9.TAX_CAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F10.TAX_CAL_CURRENCY_CODE (O)
+                                            + '""' + ',' //F29.ALLOWANCE_CHARGE_IND (O)
+                                            + '"0.00"' + ',' //F30.ALLOWANCE_ACTUAL_AMOUNT (C)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F31.ALLOWANCE_ACTUAL_CURRENCY_CODE (C)
+                                            + '""' + ',' //F32.ALLOWANCE_REASON_CODE (O)
+                                            + '""' + ',' //F33.ALLOWANCE_REASON (O)
+                                            + '""' + ',' //F34.PAYMENT_TYPE_CODE (O)
+                                            + '""' + ',' //F35.PAYMENT_DESCRIPTION (O)
+                                            + '"0001-01-01T00:00:00Z"' + ',' //F36.PAYMENT_DUE_DTM (O)
+                                            + '"' + ORIGINAL_TOTAL_AMOUNT + '"' + ',' //F37.ORIGINAL_TOTAL_AMOUNT (N)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F38.ORIGINAL_TOTAL_CURRENCY_CODE (N)
+                                            + '"0.00"' + ',' //F39.LINE_TOTAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F40.LINE_TOTAL_CURRENCY_CODE (O)
+                                            + '"0.00"' + ',' //F41.ADJUSTED_INFORMATION_AMOUNT (N)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F42.ADJUSTED_INFORMATION_CURRENCY_CODE (N)
+                                            + '"0.00"' + ',' //F43.ALLOWANCE_TOTAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F44.ALLOWANCE_TOTAL_CURRENCY_CODE (O)
+                                            + '"0.00"' + ',' //F45.CHARGE_TOTAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F46.CHARGE_TOTAL_CURRENCY_CODE (O)
+                                            + '"' + TAX_BASIS_TOTAL_AMOUNT + '"' + ',' //F47.TAX_BASIS_TOTAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F48.TAX_BASIS_TOTAL_CURRENCY_CODE (O)
+                                            + '"' + TAX_TOTAL_AMOUNT + '"' + ',' //F49.TAX_TOTAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' + ',' //F50.TAX_TOTAL_CURRENCY_CODE (O)
+                                            + '"' + GRAND_TOTAL_AMOUNT + '"' + ',' //F51.GRAND_TOTAL_AMOUNT (O)
+                                            + '"' + CURRENCY_CODE + '"' //F52.GRAND_TOTAL_CURRENCY_CODE (O)
+                                        );
+                                        // End E-TAX |Document Footer
+
+                                        // E-TAX |File Trailer
+                                        TextFile.Write(CRLF
+                                            + '"T"' + ',' //T.DATA_TYPE (M)
+                                            + '"1"' //T.TOTAL_DOCUMENT_COUNT (M)
+                                        );
+                                        // End E-TAX |File Trailer
+
+                                    end;
+                                end;
                             end;
                         end;
                     EtaxHead."BWK E-Tax Document Type"::DN:
@@ -311,9 +516,10 @@ codeunit 94000 "BWK E-Tax Function Center"
                         end;
                 end;
             end;
-
-
         end;
+
+        DownloadFromStream(InStream, 'Export', '', 'All Files (*.*)|*.*', FILE_NAME);
+        exit(true);
     end;
 
     // procedure "Export Text File"(Var EtaxLine: Record "BWK E-Tax Line")

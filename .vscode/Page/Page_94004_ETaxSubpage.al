@@ -226,9 +226,40 @@ page 94004 "BWK E-Tax Subpage"
                     ApplicationArea = all;
                     trigger OnAction()
                     var
-                        RecRef: RecordRef;
+                        ETaxFunctionCenter: Codeunit "BWK E-Tax Function Center";
+                        Eline: Record "BWK E-Tax Line";
+                        Eline2: Record "BWK E-Tax Line";
+                        GenLedSet: Record "General Ledger Setup";
+                        DocNo: Code[20];
+                        GenCount: Integer;
                     begin
-                        Message('Export Text File');
+                        Eline.Reset();
+                        Eline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                        Eline.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
+                        Eline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                        Eline.SetFilter("BWK Etax Select Export File", '%1', true);
+                        // Eline.SetFilter("BWK Etax Select Non Send INET", '%1', false);
+
+                        if Eline.FindFirst() then begin
+                            if (Eline."BWK Etax Export Text File" = true) and (Eline."BWK Etax Select Export File" = true) then begin
+                                if Not Confirm('เคย Export file ไปแล้ว ต้องการ Export file นี้ซ้ำอีกครั้งใช่หรือไม่', false) then
+                                    exit;
+                            end else begin
+                                if Eline."BWK Etax Export Text File" = false and (Eline."BWK Etax Select Export File" = true) then begin
+                                    Message('ดำเนินการ Export file เรียบร้อยแล้ว');
+                                end;
+                            end;
+
+                            ETaxFunctionCenter."Export Text File"(Eline);
+                            Eline."BWK Etax Export Text File" := true;
+                            Eline."BWK Etax User Export Text file" := UserId;
+                            Eline."BWK Etax DateTime Export Text file" := CurrentDateTime;
+
+                            Eline.Modify(true);
+                            CurrPage.Update(true);
+                        end else begin
+                            Message('No data to generate text file!');
+                        end;
                     end;
                 }
 
