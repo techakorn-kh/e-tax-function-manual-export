@@ -210,7 +210,7 @@ page 94003 "BWK E-Tax Card"
                         if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::RV then
                             lrVATEntry.SetFilter("Document Type", '%1|%2', lrVATEntry."Document Type"::" ", lrVATEntry."Document Type"::Payment);
 
-                        lrVATEntry.SetFilter("BWK Generate E-TAX", '%1', false);
+                        lrVATEntry.SetFilter("BWK Export File E-TAX", '%1', false);
                         lrVATEntry.SetFilter(Type, '%1', lrVATEntry.Type::Sale);
                         lrVATEntry.SetFilter(Base, '<>%1', 0);
                         lrVATEntry.SetFilter(Amount, '<>%1', 0);
@@ -239,7 +239,7 @@ page 94003 "BWK E-Tax Card"
 
                                                             lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                             lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                            lrVATEntry."BWK Generate E-TAX" := true;
+                                                            lrVATEntry."BWK Export File E-TAX" := true;
                                                             lrVATEntry.Modify(true);
                                                         end else begin
                                                             lrEtaxLine2.Init();
@@ -285,7 +285,7 @@ page 94003 "BWK E-Tax Card"
 
                                                             lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                             lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                            lrVATEntry."BWK Generate E-TAX" := true;
+                                                            lrVATEntry."BWK Export File E-TAX" := true;
                                                             lrVATEntry.Modify(true);
                                                             // end;
                                                         end;
@@ -437,7 +437,7 @@ page 94003 "BWK E-Tax Card"
 
                                                                     lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                                     lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                                    lrVATEntry."BWK Generate E-TAX" := true;
+                                                                    lrVATEntry."BWK Export File E-TAX" := true;
                                                                     lrVATEntry.Modify(true);
                                                                     // end;
                                                                 end;
@@ -528,7 +528,7 @@ page 94003 "BWK E-Tax Card"
 
                                                         lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                         lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                        lrVATEntry."BWK Generate E-TAX" := true;
+                                                        lrVATEntry."BWK Export File E-TAX" := true;
                                                         lrVATEntry.Modify(true);
                                                     end;
                                                 end;
@@ -559,7 +559,7 @@ page 94003 "BWK E-Tax Card"
 
                                                             lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                             lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                            lrVATEntry."BWK Generate E-TAX" := true;
+                                                            lrVATEntry."BWK Export File E-TAX" := true;
                                                             lrVATEntry.Modify(true);
                                                         end
                                                         else begin
@@ -605,7 +605,7 @@ page 94003 "BWK E-Tax Card"
 
                                                             lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                             lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                            lrVATEntry."BWK Generate E-TAX" := true;
+                                                            lrVATEntry."BWK Export File E-TAX" := true;
                                                             lrVATEntry.Modify(true);
                                                         end;
                                                     end else begin
@@ -632,7 +632,7 @@ page 94003 "BWK E-Tax Card"
 
                                                                     lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                                     lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                                    lrVATEntry."BWK Generate E-TAX" := true;
+                                                                    lrVATEntry."BWK Export File E-TAX" := true;
                                                                     lrVATEntry.Modify(true);
                                                                 end
                                                                 else begin
@@ -678,7 +678,7 @@ page 94003 "BWK E-Tax Card"
 
                                                                     lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                                                                     lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                                                                    lrVATEntry."BWK Generate E-TAX" := true;
+                                                                    lrVATEntry."BWK Export File E-TAX" := true;
                                                                     lrVATEntry.Modify(true);
                                                                 end;
                                                             end;
@@ -834,7 +834,7 @@ page 94003 "BWK E-Tax Card"
                                 end;
                             // lrVATEntry."BWK Document Type" := Rec."BWK E-Tax Document Type";
                             // lrVATEntry."BWK End date of Month" := Rec."BWK End date of Month";
-                            // lrVATEntry."BWK Generate E-TAX" := true;
+                            // lrVATEntry."BWK Export File E-TAX" := true;
                             // lrVATEntry.Modify(true);
                             until lrVATEntry.Next() = 0;
                         end else begin
@@ -858,7 +858,7 @@ page 94003 "BWK E-Tax Card"
                 //         vatEntry.SetFilter("Document No.", '%1|%2', 'DR23100001', 'DR23110001');
                 //         if vatEntry.FindSet() then begin
                 //             repeat
-                //                 vatEntry."BWK Generate E-TAX" := false;
+                //                 vatEntry."BWK Export File E-TAX" := false;
                 //                 vatEntry."Document Type" := vatEntry."Document Type"::Invoice;
                 //                 vatEntry."BWK Document Type" := vatEntry."BWK Document Type"::" ";
                 //                 vatEntry."BWK End date of Month" := 0D;

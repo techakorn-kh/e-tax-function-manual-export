@@ -98,7 +98,7 @@ pageextension 94008 "BWK Posted General Journal" extends "Posted General Journal
                     VatEntry.SetRange("Document No.", Rec."Document No.");
                     if VatEntry.FindSet() then begin
                         repeat
-                            VatEntry."BWK Generate E-TAX" := false;
+                            VatEntry."BWK Export File E-TAX" := false;
                             VatEntry.Modify();
                         until VatEntry.Next() = 0;
                         Message('Update complete.');

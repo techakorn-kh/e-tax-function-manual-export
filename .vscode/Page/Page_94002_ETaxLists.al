@@ -97,31 +97,12 @@ page 94002 "BWK E-Tax Lists"
 
                             LRecETaxHeader.Init();
                             LRecETaxHeader."BWK E-Tax Document Type" := Rec."BWK E-Tax Document Type";
-                            //LRecETaxHeader.Validate("BWK End date of Month", LDateEndDateOfMonth);
                             LRecETaxHeader.Validate("BWK End date of Month", LDateEndDateOfMonth2);
                             LRecETaxHeader.Insert(true);
-
-                            // If LRecETaxHeaderFind.Get(LRecETaxHeader."BWK E-Tax Document Type", LRecETaxHeader."BWK End date of Month") then begin
-                            //     Clear(LPageETaxCard);
-                            //     LPageETaxCard.SetTableView(LRecETaxHeaderFind);
-                            //     LPageETaxCard.Run();
-                            // end;
-
-
                         end;
-
-
-
                     end;
                 }
-
             }
         }
     }
-    // trigger OnOpenPage()
-    // begin
-    //     Rec.FilterGroup(0);
-    //     Rec.SetRange("BWK E-Tax Document Type", Rec."BWK E-Tax Document Type");
-    //     Rec.FilterGroup(2);
-    // end;
 }

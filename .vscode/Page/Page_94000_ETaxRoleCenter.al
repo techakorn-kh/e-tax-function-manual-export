@@ -15,49 +15,60 @@ page 94000 "BWK E-Tax Role Center"
             {
                 ApplicationArea = Suite;
             }
+
             part(Control1902304208; "BWK E-Tax Activities")
             {
                 ApplicationArea = Basic, Suite;
             }
+
             part(Control1907692008; "My Accounts")
             {
                 ApplicationArea = Basic, Suite;
             }
+
             part(Control103; "Trailing Sales Orders Chart")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
             }
+
             part(Control106; "My Job Queue")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
             }
+
             part(Control9; "Help And Chart Wrapper")
             {
                 ApplicationArea = Basic, Suite;
             }
+
             part(Control10; "Product Video Topics")
             {
                 ApplicationArea = All;
             }
+
             part(Control100; "Cash Flow Forecast Chart")
             {
                 ApplicationArea = Basic, Suite;
             }
+
             part(Control108; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = IMD;
                 ApplicationArea = Basic, Suite;
             }
+
             part(Control122; "Power BI Report Spinner Part")
             {
                 ApplicationArea = Basic, Suite;
             }
+
             part(Control123; "Team Member Activities")
             {
                 ApplicationArea = Suite;
             }
+
             systempart(Control1901377608; MyNotes)
             {
                 ApplicationArea = Basic, Suite;
@@ -80,6 +91,7 @@ page 94000 "BWK E-Tax Role Center"
                     RunObject = page "BWK E-Tax Lists";
                     RunPageLink = "BWK E-Tax Document Type" = filter(INV);
                 }
+
                 action(DN)
                 {
                     ApplicationArea = All;
@@ -88,6 +100,7 @@ page 94000 "BWK E-Tax Role Center"
                     RunObject = page "BWK E-Tax Lists";
                     RunPageLink = "BWK E-Tax Document Type" = filter(DN);
                 }
+
                 action(CN)
                 {
                     ApplicationArea = All;
@@ -96,14 +109,7 @@ page 94000 "BWK E-Tax Role Center"
                     RunObject = page "BWK E-Tax Lists";
                     RunPageLink = "BWK E-Tax Document Type" = filter(CN);
                 }
-                // action(SR)
-                // {
-                //     ApplicationArea = All;
-                //     Caption = '[SR] ใบเสร็จรับเงิน/ใบกำกับภาษี';
-                //     Image = List;
-                //     RunObject = page "BWK E-Tax Lists";
-                //     RunPageLink = "BWK E-Tax Document Type" = filter(SR);
-                // }
+
                 action(RV)
                 {
                     ApplicationArea = All;

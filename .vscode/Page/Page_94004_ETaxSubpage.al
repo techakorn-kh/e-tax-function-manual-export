@@ -161,69 +161,11 @@ page 94004 "BWK E-Tax Subpage"
             {
                 Caption = 'Function';
 
-                // action("BWK Export File")
-                // {
-                //     Caption = 'Export Text File';
-                //     ApplicationArea = All;
-                //     Image = Export;
-                //     trigger OnAction()
-                //     var
-                //         ETaxFunctionCenter: Codeunit "BWK E-Tax Function Center";
-                //         Eline: Record "BWK E-Tax Line";
-                //         Eline2: Record "BWK E-Tax Line";
-                //         GenLedSet: Record "General Ledger Setup";
-                //         DocNo: Code[20];
-                //         GenCount: Integer;
-                //     begin
-                //         Clear(DocNo);
-                //         Eline.Reset();
-                //         Eline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                //         Eline.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
-                //         Eline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                //         Eline.SetFilter("BWK Etax Select Export File", '%1', true);
-                //         Eline.SetFilter("BWK Etax Select Non Send INET", '%1', false);
-
-                //         if Eline.FindFirst() then begin
-                //             Eline2.Reset();
-                //             Eline2.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                //             Eline2.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
-                //             Eline2.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                //             Eline2.SetFilter("BWK Etax Export File", '%1', rec."BWK Etax Export File");
-                //             Eline2.SetFilter("BWK Etax Select Export File", '%1', rec."BWK Etax Select Export File");
-                //             if Eline2.FindFirst() then begin
-                //                 GenCount := Eline.count;
-
-                //                 if (Eline."BWK Etax Export File" = true) and (Eline."BWK Etax Select Export File" = true) then begin
-                //                     if Not Confirm('เคย Export file ไปแล้ว ต้องการ Export file นี้ซ้ำอีกครั้งใช่หรือไม่', false) then
-                //                         exit;
-                //                 end else
-                //                     if Eline."BWK Etax Export File" = false and (Eline."BWK Etax Select Export File" = true) then begin
-                //                         Message('ดำเนินการ Export file เรียบร้อยแล้ว จำนวน %1 รายการ', Format(GenCount));
-                //                     end;
-                //             end;
-
-                //             repeat
-                //                 ETaxFunctionCenter."Export Text File"(Eline);
-                //                 ETaxFunctionCenter."Export PDF File"(Eline);
-                //                 Eline."BWK Etax Export File" := true;
-                //                 Eline."BWK Etax User Export file" := UserId;
-                //                 Eline."BWK Etax DateTime Export file" := CurrentDateTime;
-
-                //                 Eline.Modify(true);
-                //             until Eline.Next = 0;
-
-                //             CurrPage.Update(true);
-                //         end else begin
-                //             Message('No data to generate text file!');
-                //         end;
-                //     end;
-                // }
-
-                action("BWK Export Text File")
+                action("BWK Export File")
                 {
                     Caption = 'Export Text File';
+                    ApplicationArea = All;
                     Image = Export;
-                    ApplicationArea = all;
                     trigger OnAction()
                     var
                         ETaxFunctionCenter: Codeunit "BWK E-Tax Function Center";
@@ -232,30 +174,54 @@ page 94004 "BWK E-Tax Subpage"
                         GenLedSet: Record "General Ledger Setup";
                         DocNo: Code[20];
                         GenCount: Integer;
+                        ExportCount: Integer;
                     begin
+                        Clear(DocNo);
                         Eline.Reset();
                         Eline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
                         Eline.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
                         Eline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
                         Eline.SetFilter("BWK Etax Select Export File", '%1', true);
-                        // Eline.SetFilter("BWK Etax Select Non Send INET", '%1', false);
 
                         if Eline.FindFirst() then begin
-                            if (Eline."BWK Etax Export Text File" = true) and (Eline."BWK Etax Select Export File" = true) then begin
-                                if Not Confirm('เคย Export file ไปแล้ว ต้องการ Export file นี้ซ้ำอีกครั้งใช่หรือไม่', false) then
-                                    exit;
-                            end else begin
+                            Eline2.Reset();
+                            Eline2.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                            Eline2.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
+                            Eline2.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                            Eline2.SetFilter("BWK Etax Export Text File", '%1', rec."BWK Etax Export Text File");
+                            Eline2.SetFilter("BWK Etax Select Export File", '%1', rec."BWK Etax Select Export File");
+                            if Eline2.FindFirst() then begin
+                                GenCount := Eline.count;
+
+                                if (Eline."BWK Etax Export Text File" = true) and (Eline."BWK Etax Select Export File" = true) then begin
+                                    if Not Confirm('เคย Export file ไปแล้ว ต้องการ Export file นี้ซ้ำอีกครั้งใช่หรือไม่', false) then begin
+                                        exit;
+                                    end;
+                                end;
+
+                                repeat
+                                    if ETaxFunctionCenter."Export Text File"(Eline) then begin
+                                        Eline."BWK Etax Export Text File" := true;
+                                        Eline."BWK Etax User Export Text file" := UserId;
+                                        Eline."BWK Etax DateTime Export Text file" := CurrentDateTime;
+
+                                        if ETaxFunctionCenter."Export PDF File"(Eline) then begin
+                                            Eline."BWK Etax Export PDF File" := true;
+                                            Eline."BWK Etax User Export PDF file" := UserId;
+                                            Eline."BWK Etax DateTime Export PDF file" := CurrentDateTime;
+
+                                            ExportCount := ExportCount + 1;
+                                        end;
+                                    end;
+
+                                    Eline.Modify(true);
+                                until Eline.Next = 0;
+
                                 if Eline."BWK Etax Export Text File" = false and (Eline."BWK Etax Select Export File" = true) then begin
-                                    Message('ดำเนินการ Export file เรียบร้อยแล้ว');
+                                    Message('ดำเนินการ Export file เรียบร้อยแล้ว จำนวน %1 รายการ', Format(GenCount));
                                 end;
                             end;
 
-                            ETaxFunctionCenter."Export Text File"(Eline);
-                            Eline."BWK Etax Export Text File" := true;
-                            Eline."BWK Etax User Export Text file" := UserId;
-                            Eline."BWK Etax DateTime Export Text file" := CurrentDateTime;
-
-                            Eline.Modify(true);
                             CurrPage.Update(true);
                         end else begin
                             Message('No data to generate text file!');
@@ -263,73 +229,60 @@ page 94004 "BWK E-Tax Subpage"
                     end;
                 }
 
-                action("BWK Export PDF File")
+                action("BWK Select All")
                 {
-                    Caption = 'Export PDF File';
-                    Image = Export;
+                    Caption = 'Select All';
+                    Image = Approve;
                     ApplicationArea = all;
                     trigger OnAction()
                     var
+                        lrecEline: record "BWK E-Tax Line";
+                        lpageEsub: Page "BWK E-Tax Subpage";
                         RecRef: RecordRef;
                     begin
-                        Message('Export PDF File');
+                        lrecEline.Reset();
+                        lrecEline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                        lrecEline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                        lrecEline.SetFilter("BWK Etax Select Export File", '%1', false);
+
+                        if lrecEline.FindFirst() then begin
+                            if lrecEline.FindSet() then begin
+                                repeat
+                                    lrecEline."BWK Etax Select Export File" := true;
+                                    lrecEline.Modify(true);
+                                until lrecEline.Next() = 0;
+                            end;
+                        end;
                     end;
                 }
 
-                // action("BWK Select All")
-                // {
-                //     Caption = 'Select All';
-                //     Image = Approve;
-                //     ApplicationArea = all;
-                //     trigger OnAction()
-                //     var
-                //         lrecEline: record "BWK E-Tax Line";
-                //         lpageEsub: Page "BWK E-Tax Subpage";
-                //         RecRef: RecordRef;
-                //     begin
-                //         lrecEline.Reset();
-                //         lrecEline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                //         lrecEline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                //         lrecEline.SetFilter("BWK Etax Select Export File", '%1', false);
-                //         // lrecEline.SetFilter("BWK Etax Select Non Send INET", '%1', false);
+                action("BWK Clear Select All")
+                {
+                    Caption = 'Clear Select All';
+                    Image = Cancel;
+                    ApplicationArea = all;
+                    trigger OnAction()
+                    var
+                        lrecEline: record "BWK E-Tax Line";
+                        lpageEsub: Page "BWK E-Tax Subpage";
+                        RecRef: RecordRef;
+                    begin
+                        lrecEline.Reset();
+                        lrecEline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                        lrecEline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                        lrecEline.SetFilter("BWK Etax Select Export File", '%1', true);
 
-                //         if lrecEline.FindFirst() then begin
-                //             if lrecEline.FindSet() then begin
-                //                 repeat
-                //                     lrecEline."BWK Etax Select Export File" := true;
-                //                     lrecEline.Modify(true);
-                //                 until lrecEline.Next() = 0;
-                //             end;
-                //         end;
-                //     end;
-                // }
+                        if lrecEline.FindFirst() then begin
+                            if lrecEline.FindSet() then begin
+                                repeat
+                                    lrecEline."BWK Etax Select Export File" := false;
+                                    lrecEline.Modify(true);
+                                until lrecEline.Next() = 0;
+                            end;
+                        end;
+                    end;
+                }
 
-                // action("BWK Clear Select All")
-                // {
-                //     Caption = 'Clear Select All';
-                //     Image = Cancel;
-                //     ApplicationArea = all;
-                //     trigger OnAction()
-                //     var
-                //         lrecEline: record "BWK E-Tax Line";
-                //         lpageEsub: Page "BWK E-Tax Subpage";
-                //         RecRef: RecordRef;
-                //     begin
-                //         lrecEline.Reset();
-                //         lrecEline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                //         lrecEline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                //         lrecEline.SetFilter("BWK Etax Select Export File", '%1', true);
-
-                //         if lrecEline.FindFirst() then begin
-                //             if lrecEline.FindSet() then begin
-                //                 repeat
-                //                     lrecEline."BWK Etax Select Export File" := false;
-                //                     lrecEline.Modify(true);
-                //                 until lrecEline.Next() = 0;
-                //             end;
-                //         end;
-                //     end;
-                // }
                 action("BWK Open Document")
                 {
                     Caption = 'Card';
@@ -398,53 +351,53 @@ page 94004 "BWK E-Tax Subpage"
                         ErrorTxt001: Label 'Report ID % 1 not found in table Report Option Setup';
                         ETaxFunctionCenter: Codeunit "BWK E-Tax Function Center";
                     begin
-                        GenLedSetup.Get();
+                        // GenLedSetup.Get();
 
-                        if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::INV then begin
-                            lrSalesINVHeader.Reset();
-                            lrSalesINVHeader.SetFilter("No.", '%1', rec."BWK Document No.");
-                            if lrSalesINVHeader.FindFirst() then begin
-                                GenLedSetup.TestField("BWK Etax Sales Invoice Form ID");
-                                Report.RunModal(GenLedSetup."BWK Etax Sales Invoice Form ID", true, true, lrSalesINVHeader);
-                            end;
-                        end else
-                            if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::DN then begin
-                                lrSalesINVHeader.Reset();
-                                lrSalesINVHeader.SetFilter("No.", '%1', rec."BWK Document No.");
-                                if lrSalesINVHeader.FindFirst() then begin
-                                    GenLedSetup.TestField("BWK Etax Sales DN Form ID");
-                                    Report.RunModal(GenLedSetup."BWK Etax Sales DN Form ID", true, true, lrSalesINVHeader);
-                                end;
-                            end else
-                                if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::CN then begin
-                                    lrSalesCrMemoHeader.Reset();
-                                    lrSalesCrMemoHeader.SetFilter("No.", '%1', rec."BWK Document No.");
-                                    if lrSalesCrMemoHeader.FindFirst() then begin
-                                        GenLedSetup.TestField("BWK Etax Sales Cr Memo Form ID");
-                                        Report.RunModal(GenLedSetup."BWK Etax Sales Cr Memo Form ID", true, true, lrSalesCrMemoHeader);
-                                    end;
-                                end else
-                                    if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::RV then begin
-                                        //20240122 >>>
-                                        DetailCustLedger.Reset();
-                                        DetailCustLedger.SetRange("Document No.", rec."BWK Document No.");
-                                        DetailCustLedger.SetRange("Initial Document Type", DetailCustLedger."Initial Document Type"::Invoice);
-                                        if DetailCustLedger.FindFirst() then begin
-                                            GenLedSetup.TestField("BWK Etax Sales Receipt Form ID");
-                                            CustLedger.Reset();
-                                            CustLedger.SetRange("Entry No.", DetailCustLedger."Cust. Ledger Entry No.");
+                        // if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::INV then begin
+                        //     lrSalesINVHeader.Reset();
+                        //     lrSalesINVHeader.SetFilter("No.", '%1', rec."BWK Document No.");
+                        //     if lrSalesINVHeader.FindFirst() then begin
+                        //         GenLedSetup.TestField("BWK Etax Sales Invoice Form ID");
+                        //         Report.RunModal(GenLedSetup."BWK Etax Sales Invoice Form ID", true, true, lrSalesINVHeader);
+                        //     end;
+                        // end else
+                        //     if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::DN then begin
+                        //         lrSalesINVHeader.Reset();
+                        //         lrSalesINVHeader.SetFilter("No.", '%1', rec."BWK Document No.");
+                        //         if lrSalesINVHeader.FindFirst() then begin
+                        //             GenLedSetup.TestField("BWK Etax Sales DN Form ID");
+                        //             Report.RunModal(GenLedSetup."BWK Etax Sales DN Form ID", true, true, lrSalesINVHeader);
+                        //         end;
+                        //     end else
+                        //         if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::CN then begin
+                        //             lrSalesCrMemoHeader.Reset();
+                        //             lrSalesCrMemoHeader.SetFilter("No.", '%1', rec."BWK Document No.");
+                        //             if lrSalesCrMemoHeader.FindFirst() then begin
+                        //                 GenLedSetup.TestField("BWK Etax Sales Cr Memo Form ID");
+                        //                 Report.RunModal(GenLedSetup."BWK Etax Sales Cr Memo Form ID", true, true, lrSalesCrMemoHeader);
+                        //             end;
+                        //         end else
+                        //             if Rec."BWK E-Tax Document Type" = rec."BWK E-Tax Document Type"::RV then begin
+                        //                 //20240122 >>>
+                        //                 DetailCustLedger.Reset();
+                        //                 DetailCustLedger.SetRange("Document No.", rec."BWK Document No.");
+                        //                 DetailCustLedger.SetRange("Initial Document Type", DetailCustLedger."Initial Document Type"::Invoice);
+                        //                 if DetailCustLedger.FindFirst() then begin
+                        //                     GenLedSetup.TestField("BWK Etax Sales Receipt Form ID");
+                        //                     CustLedger.Reset();
+                        //                     CustLedger.SetRange("Entry No.", DetailCustLedger."Cust. Ledger Entry No.");
 
-                                            Report.RunModal(GenLedSetup."BWK Etax Sales Receipt Form ID", true, true, CustLedger);
-                                        end else begin
-                                            PostedGenJnlLine.Reset();
-                                            PostedGenJnlLine.SetRange("Document No.", Rec."BWK Document No.");
-                                            PostedGenJnlLine.SetRange("BWK Deposit", true);
-                                            if PostedGenJnlLine.Find('-') then begin
-                                                GenLedSetup.TestField("BWK Etax Rec Deposit Form ID");
-                                                Report.RunModal(GenLedSetup."BWK Etax Rec Deposit Form ID", true, true, PostedGenJnlLine);
-                                            end;
-                                        end;
-                                    end;
+                        //                     Report.RunModal(GenLedSetup."BWK Etax Sales Receipt Form ID", true, true, CustLedger);
+                        //                 end else begin
+                        //                     PostedGenJnlLine.Reset();
+                        //                     PostedGenJnlLine.SetRange("Document No.", Rec."BWK Document No.");
+                        //                     PostedGenJnlLine.SetRange("BWK Deposit", true);
+                        //                     if PostedGenJnlLine.Find('-') then begin
+                        //                         GenLedSetup.TestField("BWK Etax Rec Deposit Form ID");
+                        //                         Report.RunModal(GenLedSetup."BWK Etax Rec Deposit Form ID", true, true, PostedGenJnlLine);
+                        //                     end;
+                        //                 end;
+                        //             end;
                     end;
                 }
             }

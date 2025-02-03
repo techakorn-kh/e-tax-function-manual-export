@@ -5,7 +5,7 @@ pageextension 94000 "BWK VAT Entries" extends "VAT Entries"
         //Customize Siravich 031023 ASB2310-0034
         addlast(Control1)
         {
-            field("BWK Generate E-TAX"; Rec."BWK Generate E-TAX")
+            field("BWK Export File E-TAX"; Rec."BWK Export File E-TAX")
             {
                 ApplicationArea = All;
 

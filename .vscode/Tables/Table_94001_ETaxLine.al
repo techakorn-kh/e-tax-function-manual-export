@@ -171,18 +171,24 @@ table 94001 "BWK E-Tax Line"
             Editable = false;
         }
 
-        field(27; "BWK Etax Text file name"; Text[500])
+        field(27; "BWK Etax Text File Name"; Text[500])
         {
-            Caption = 'Path Text file name';
+            Caption = 'Path Text File Name';
             DataClassification = CustomerContent;
             Editable = false;
         }
 
-        field(28; "BWK Etax PDF file name"; Text[500])
+        field(28; "BWK Etax PDF File Name"; Text[500])
         {
-            Caption = 'Path PDF file name';
+            Caption = 'Path PDF File Name';
             DataClassification = CustomerContent;
             Editable = false;
+        }
+
+        field(29; "BWK Etax Select Non Send Email"; Boolean)
+        {
+            Caption = 'Non Send Email';
+            DataClassification = SystemMetadata;
         }
     }
 
@@ -191,7 +197,6 @@ table 94001 "BWK E-Tax Line"
         key(Key1; "BWK E-Tax Document Type", "BWK End date of Month", "BWK Source Table", "BWK Document No.", "BWK Line No.")
         {
         }
-
     }
 
 
@@ -199,17 +204,16 @@ table 94001 "BWK E-Tax Line"
     var
         Vatentry: Record "VAT Entry";
     begin
-        // Rec.TestField("BWK Etax Send File", false);
-        // Vatentry.Reset();
-        // Vatentry.SetRange("Document No.", Rec."BWK Document No.");
-        // Vatentry.SetRange("BWK Generate E-TAX", true);
-        // if Vatentry.FindSet() then begin
-        //     repeat
-        //         Vatentry."BWK Document Type" := Vatentry."BWK Document Type"::" ";
-        //         Vatentry."BWK End date of Month" := 0D;
-        //         Vatentry."BWK Generate E-TAX" := false;
-        //         Vatentry.Modify();
-        //     until Vatentry.Next() = 0;
-        // end;
+        Vatentry.Reset();
+        Vatentry.SetRange("Document No.", Rec."BWK Document No.");
+        Vatentry.SetRange("BWK Export File E-TAX", true);
+        if Vatentry.FindSet() then begin
+            repeat
+                Vatentry."BWK Document Type" := Vatentry."BWK Document Type"::" ";
+                Vatentry."BWK End date of Month" := 0D;
+                Vatentry."BWK Export File E-TAX" := false;
+                Vatentry.Modify();
+            until Vatentry.Next() = 0;
+        end;
     end;
 }
