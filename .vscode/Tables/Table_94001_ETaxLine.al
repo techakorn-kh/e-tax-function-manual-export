@@ -114,7 +114,6 @@ table 94001 "BWK E-Tax Line"
         {
             Caption = 'Line No.';
             DataClassification = SystemMetadata;
-
         }
 
         field(19; "BWK VAT Prod. Posting Group"; Code[20])
@@ -123,72 +122,93 @@ table 94001 "BWK E-Tax Line"
             TableRelation = "VAT Product Posting Group";
         }
 
-        field(20; "BWK Etax Select Export File"; Boolean)
+        field(20; "BWK Etax Select"; Boolean)
         {
-            Caption = 'Select Export File';
+            Caption = 'Select';
             DataClassification = SystemMetadata;
         }
 
-        field(21; "BWK Etax Export Text File"; Boolean)
+        field(21; "BWK Etax Text File"; Boolean)
         {
-            Caption = 'Export Text File';
-            DataClassification = SystemMetadata;
-            Editable = false;
-        }
-
-        field(22; "BWK Etax Export PDF File"; Boolean)
-        {
-            Caption = 'Export PDF File';
+            Caption = 'Text File';
             DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(23; "BWK Etax User Export Text file"; code[50])
+        field(22; "BWK Etax PDF File"; Boolean)
         {
-            Caption = 'User Export Text file';
+            Caption = 'PDF File';
             DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(24; "BWK Etax User Export PDF file"; code[50])
+        field(23; "BWK Etax PDF Sign File"; Boolean)
         {
-            Caption = 'User Export PDF file';
+            Caption = 'PDF Sign File';
             DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(25; "BWK Etax DateTime Export Text file"; DateTime)
+        field(24; "BWK Etax XML File"; Boolean)
         {
-            Caption = 'DateTime Export Text file';
+            Caption = 'XML File';
             DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(26; "BWK Etax DateTime Export PDF file"; DateTime)
+        field(25; "BWK Etax Text file name"; Text[500])
         {
-            Caption = 'DateTime Export PDF file';
+            Caption = 'Text file name';
             DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(27; "BWK Etax Text File Name"; Text[500])
+        field(26; "BWK Etax PDF file name"; Text[500])
         {
-            Caption = 'Path Text File Name';
-            DataClassification = CustomerContent;
+            Caption = 'PDF file name';
+            DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(28; "BWK Etax PDF File Name"; Text[500])
+        field(27; "BWK Etax PDF Sign file name"; Text[500])
         {
-            Caption = 'Path PDF File Name';
-            DataClassification = CustomerContent;
+            Caption = 'PDF Sign file name';
+            DataClassification = SystemMetadata;
             Editable = false;
         }
 
-        field(29; "BWK Etax Select Non Send Email"; Boolean)
+        field(28; "BWK Etax XML file name"; Text[500])
+        {
+            Caption = 'XML file name';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+
+        field(29; "BWK Etax User Export file"; code[50])
+        {
+            Caption = 'User Export file';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+
+        field(30; "BWK Etax DateTime Export file"; DateTime)
+        {
+            Caption = 'DateTime Export file';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+
+        field(31; "BWK Etax Select Non Send Email"; Boolean)
         {
             Caption = 'Non Send Email';
             DataClassification = SystemMetadata;
+        }
+
+        field(32; "BWK Etax User Select"; code[50])
+        {
+            Caption = 'User Select';
+            DataClassification = SystemMetadata;
+            Editable = false;
         }
     }
 
@@ -202,18 +222,18 @@ table 94001 "BWK E-Tax Line"
 
     trigger OnDelete()
     var
-        Vatentry: Record "VAT Entry";
+        lrVatEntry: Record "VAT Entry";
     begin
-        Vatentry.Reset();
-        Vatentry.SetRange("Document No.", Rec."BWK Document No.");
-        Vatentry.SetRange("BWK Export File E-TAX", true);
-        if Vatentry.FindSet() then begin
+        lrVatEntry.Reset();
+        lrVatEntry.SetRange("Document No.", Rec."BWK Document No.");
+        lrVatEntry.SetRange("BWK Export File E-TAX", true);
+        if lrVatEntry.FindSet() then begin
             repeat
-                Vatentry."BWK Document Type" := Vatentry."BWK Document Type"::" ";
-                Vatentry."BWK End date of Month" := 0D;
-                Vatentry."BWK Export File E-TAX" := false;
-                Vatentry.Modify();
-            until Vatentry.Next() = 0;
+                lrVatEntry."BWK Document Type" := lrVatEntry."BWK Document Type"::" ";
+                lrVatEntry."BWK End date of Month" := 0D;
+                lrVatEntry."BWK Export File E-TAX" := false;
+                lrVatEntry.Modify();
+            until lrVatEntry.Next() = 0;
         end;
     end;
 }

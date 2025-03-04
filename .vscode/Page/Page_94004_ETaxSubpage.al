@@ -15,21 +15,33 @@ page 94004 "BWK E-Tax Subpage"
             {
                 Caption = 'General';
 
-                field("BWK Etax Select Export File"; Rec."BWK Etax Select Export File")
+                field("BWK Etax Select"; Rec."BWK Etax Select")
                 {
                     ApplicationArea = All;
                 }
 
-                field("BWK Etax Export Text File"; Rec."BWK Etax Export Text File")
+                field("BWK Etax Select Non Send Email"; Rec."BWK Etax Select Non Send Email")
+                {
+                    ApplicationArea = All;
+                }
+                field("BWK Etax Text File"; Rec."BWK Etax Text File")
+                {
+                    ApplicationArea = all;
+                }
+                field("BWK Etax PDF File"; Rec."BWK Etax PDF File")
                 {
                     ApplicationArea = all;
                 }
 
-                field("BWK Etax Export PDF File"; Rec."BWK Etax Export PDF File")
+                field("BWK Etax PDF Sign File"; Rec."BWK Etax PDF Sign File")
                 {
                     ApplicationArea = all;
                 }
 
+                field("BWK Etax XML File"; Rec."BWK Etax XML File")
+                {
+                    ApplicationArea = all;
+                }
                 field("BWK Document No."; Rec."BWK Document No.")
                 {
                     ApplicationArea = All;
@@ -130,22 +142,22 @@ page 94004 "BWK E-Tax Subpage"
                     ApplicationArea = all;
                 }
 
-                field("BWK Etax User Export Text file"; Rec."BWK Etax User Export Text file")
+                field("BWK Etax PDF Sign file name"; Rec."BWK Etax PDF Sign file name")
                 {
                     ApplicationArea = all;
                 }
 
-                field("BWK Etax DateTime Export Text file"; Rec."BWK Etax DateTime Export Text file")
+                field("BWK Etax XML file name"; Rec."BWK Etax XML file name")
                 {
                     ApplicationArea = all;
                 }
 
-                field("BWK Etax User Export PDF file"; Rec."BWK Etax User Export PDF file")
+                field("BWK Etax User Export file"; Rec."BWK Etax User Export file")
                 {
                     ApplicationArea = all;
                 }
 
-                field("BWK Etax DateTime Export PDF file"; Rec."BWK Etax DateTime Export PDF file")
+                field("BWK Etax DateTime Export file"; Rec."BWK Etax DateTime Export file")
                 {
                     ApplicationArea = all;
                 }
@@ -169,116 +181,105 @@ page 94004 "BWK E-Tax Subpage"
                     trigger OnAction()
                     var
                         ETaxFunctionCenter: Codeunit "BWK E-Tax Function Center";
-                        Eline: Record "BWK E-Tax Line";
-                        Eline2: Record "BWK E-Tax Line";
+                        EtaxLine: Record "BWK E-Tax Line";
+                        EtaxLine2: Record "BWK E-Tax Line";
                         GenLedSet: Record "General Ledger Setup";
-                        DocNo: Code[20];
-                        GenCount: Integer;
-                        ExportCount: Integer;
+                        varCount, varExportCount : Integer;
                     begin
-                        Clear(DocNo);
-                        Eline.Reset();
-                        Eline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                        Eline.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
-                        Eline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                        Eline.SetFilter("BWK Etax Select Export File", '%1', true);
+                        EtaxLine.Reset();
+                        EtaxLine.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                        EtaxLine.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
+                        EtaxLine.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                        EtaxLine.SetFilter("BWK Etax Select", '%1', true);
 
-                        if Eline.FindFirst() then begin
-                            Eline2.Reset();
-                            Eline2.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                            Eline2.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
-                            Eline2.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                            Eline2.SetFilter("BWK Etax Export Text File", '%1', rec."BWK Etax Export Text File");
-                            Eline2.SetFilter("BWK Etax Select Export File", '%1', rec."BWK Etax Select Export File");
-                            if Eline2.FindFirst() then begin
-                                GenCount := Eline.count;
-
-                                if (Eline."BWK Etax Export Text File" = true) and (Eline."BWK Etax Select Export File" = true) then begin
-                                    if Not Confirm('เคย Export file ไปแล้ว ต้องการ Export file นี้ซ้ำอีกครั้งใช่หรือไม่', false) then begin
-                                        exit;
-                                    end;
-                                end;
-
-                                repeat
-                                    if ETaxFunctionCenter."Export Text File"(Eline) then begin
-                                        Eline."BWK Etax Export Text File" := true;
-                                        Eline."BWK Etax User Export Text file" := UserId;
-                                        Eline."BWK Etax DateTime Export Text file" := CurrentDateTime;
-
-                                        if ETaxFunctionCenter."Export PDF File"(Eline) then begin
-                                            Eline."BWK Etax Export PDF File" := true;
-                                            Eline."BWK Etax User Export PDF file" := UserId;
-                                            Eline."BWK Etax DateTime Export PDF file" := CurrentDateTime;
-
-                                            ExportCount := ExportCount + 1;
-                                        end;
-                                    end;
-
-                                    Eline.Modify(true);
-                                until Eline.Next = 0;
-
-                                if Eline."BWK Etax Export Text File" = false and (Eline."BWK Etax Select Export File" = true) then begin
-                                    Message('ดำเนินการ Export file เรียบร้อยแล้ว จำนวน %1 รายการ', Format(GenCount));
+                        if EtaxLine.FindFirst() then begin
+                            if (EtaxLine."BWK Etax Text File" = true) and (EtaxLine."BWK Etax Select" = true) then begin
+                                if Not Confirm('พบเอกสารที่มีการ Export file ไปก่อนหน้า ต้องการ Export file ซ้ำใช่หรือไม่?', false) then begin
+                                    exit;
                                 end;
                             end;
 
+                            // EtaxLine2.Reset();
+                            // EtaxLine2.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                            // EtaxLine2.SetFilter("BWK End date of Month", '%1', rec."BWK End date of Month");
+                            // EtaxLine2.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                            // EtaxLine2.SetFilter("BWK Etax Text File", '%1', rec."BWK Etax Text File");
+                            // EtaxLine2.SetFilter("BWK Etax Select", '%1', rec."BWK Etax Select");
+                            // if EtaxLine2.FindFirst() then begin
+                            //     varCount := EtaxLine2.count;
+                            // end;
+
+                            repeat
+                                // if ETaxFunctionCenter."Export Text File"(EtaxLine) then begin
+                                EtaxLine."BWK Etax Text File" := true;
+                                EtaxLine."BWK Etax PDF File" := true;
+
+                                //     if ETaxFunctionCenter."Export PDF File"(EtaxLine) then begin
+                                //         EtaxLine."BWK Etax User Export file" := UserId;
+                                //         EtaxLine."BWK Etax DateTime Export file" := CurrentDateTime;
+                                //     end;
+                                // end;
+
+                                EtaxLine."BWK Etax User Export file" := UserId;
+                                EtaxLine."BWK Etax DateTime Export file" := CurrentDateTime;
+                                varExportCount := varExportCount + 1;
+
+                                EtaxLine.Modify(true);
+                            until EtaxLine.Next = 0;
+
                             CurrPage.Update(true);
+
+                            Message('ดำเนินการ Export file เรียบร้อยแล้ว จำนวน %1 รายการ', Format(varExportCount));
                         end else begin
-                            Message('No data to generate text file!');
+                            Message('โปรดเลือกเอกสารอย่างน้อย 1 รายการ');
                         end;
                     end;
                 }
 
                 action("BWK Select All")
                 {
-                    Caption = 'Select All';
                     Image = Approve;
+                    Caption = 'Select All';
                     ApplicationArea = all;
+
                     trigger OnAction()
                     var
-                        lrecEline: record "BWK E-Tax Line";
-                        lpageEsub: Page "BWK E-Tax Subpage";
-                        RecRef: RecordRef;
+                        EtaxLine: record "BWK E-Tax Line";
                     begin
-                        lrecEline.Reset();
-                        lrecEline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                        lrecEline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                        lrecEline.SetFilter("BWK Etax Select Export File", '%1', false);
+                        EtaxLine.Reset();
+                        EtaxLine.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                        EtaxLine.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                        EtaxLine.SetFilter("BWK Etax Select", '%1', false);
 
-                        if lrecEline.FindFirst() then begin
-                            if lrecEline.FindSet() then begin
-                                repeat
-                                    lrecEline."BWK Etax Select Export File" := true;
-                                    lrecEline.Modify(true);
-                                until lrecEline.Next() = 0;
-                            end;
+                        if EtaxLine.FindSet() then begin
+                            repeat
+                                EtaxLine."BWK Etax Select" := true;
+                                EtaxLine.Modify(true);
+                            until EtaxLine.Next() = 0;
                         end;
                     end;
                 }
 
                 action("BWK Clear Select All")
                 {
-                    Caption = 'Clear Select All';
                     Image = Cancel;
+                    Caption = 'Clear Select All';
                     ApplicationArea = all;
+
                     trigger OnAction()
                     var
-                        lrecEline: record "BWK E-Tax Line";
-                        lpageEsub: Page "BWK E-Tax Subpage";
-                        RecRef: RecordRef;
+                        EtaxLine: record "BWK E-Tax Line";
                     begin
-                        lrecEline.Reset();
-                        lrecEline.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
-                        lrecEline.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
-                        lrecEline.SetFilter("BWK Etax Select Export File", '%1', true);
+                        EtaxLine.Reset();
+                        EtaxLine.SetFilter("BWK E-Tax Document Type", '%1', rec."BWK E-Tax Document Type");
+                        EtaxLine.SetFilter("BWK Source Table", '%1', rec."BWK Source Table");
+                        EtaxLine.SetFilter("BWK Etax Select", '%1', true);
 
-                        if lrecEline.FindFirst() then begin
-                            if lrecEline.FindSet() then begin
-                                repeat
-                                    lrecEline."BWK Etax Select Export File" := false;
-                                    lrecEline.Modify(true);
-                                until lrecEline.Next() = 0;
-                            end;
+                        if EtaxLine.FindSet() then begin
+                            repeat
+                                EtaxLine."BWK Etax Select" := false;
+                                EtaxLine.Modify(true);
+                            until EtaxLine.Next() = 0;
                         end;
                     end;
                 }
@@ -393,8 +394,8 @@ page 94004 "BWK E-Tax Subpage"
                         //                     PostedGenJnlLine.SetRange("Document No.", Rec."BWK Document No.");
                         //                     PostedGenJnlLine.SetRange("BWK Deposit", true);
                         //                     if PostedGenJnlLine.Find('-') then begin
-                        //                         GenLedSetup.TestField("BWK Etax Rec Deposit Form ID");
-                        //                         Report.RunModal(GenLedSetup."BWK Etax Rec Deposit Form ID", true, true, PostedGenJnlLine);
+                        //                         GenLedSetup.TestField("BWK Etax Rcp Deposit Form ID");
+                        //                         Report.RunModal(GenLedSetup."BWK Etax Rcp Deposit Form ID", true, true, PostedGenJnlLine);
                         //                     end;
                         //                 end;
                         //             end;
@@ -409,27 +410,27 @@ page 94004 "BWK E-Tax Subpage"
         lrecEline: Record "BWK E-Tax Line";
     begin
         lrecEline.Reset();
-        lrecEline.SetFilter("BWK Etax Select Export File", '%1', true);
+        lrecEline.SetFilter("BWK Etax Select", '%1', true);
         if lrecEline.FindFirst() then begin
             repeat
-                Clear(lrecEline."BWK Etax Select Export File");
+                Clear(lrecEline."BWK Etax Select");
                 lrecEline.Modify(true);
             until lrecEline.Next() = 0;
         end;
 
     end;
 
-    local procedure GetFileStream(FileName: Text; var FileStream: InStream): Boolean
-    var
-        TempBlob: Codeunit "Temp Blob";
-        OutStream: OutStream;
-    begin
-        // Simulate file content (Replace this with real file retrieval)
-        TempBlob.CreateOutStream(OutStream);
-        OutStream.WriteText('Dummy content for ' + FileName);
-        TempBlob.CreateInStream(FileStream);
-        exit(true);
-    end;
+    // local procedure GetFileStream(FileName: Text; var FileStream: InStream): Boolean
+    // var
+    //     TempBlob: Codeunit "Temp Blob";
+    //     OutStream: OutStream;
+    // begin
+    //     // Simulate file content (Replace this with real file retrieval)
+    //     TempBlob.CreateOutStream(OutStream);
+    //     OutStream.WriteText('Dummy content for ' + FileName);
+    //     TempBlob.CreateInStream(FileStream);
+    //     exit(true);
+    // end;
 
     var
         statuslock: Boolean;

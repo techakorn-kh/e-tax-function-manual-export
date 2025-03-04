@@ -16,35 +16,40 @@ page 94003 "BWK E-Tax Card"
             group("BWK General")
             {
                 Caption = 'General';
-                //Customize Siravich 031023 ASB2310-0032
+
                 field("BWK E-Tax Document Type"; Rec."BWK E-Tax Document Type")
                 {
                     ApplicationArea = all;
                     trigger OnValidate()
                     begin
-                        if Rec."BWK E-Tax Document Type" = Rec."BWK E-Tax Document Type"::" " then
+                        if Rec."BWK E-Tax Document Type" = Rec."BWK E-Tax Document Type"::" " then begin
                             Error('Document type must be not is empty!');
+                        end;
                     end;
                 }
-                //Customize Siravich 031023 ASB2310-0032
+
                 field("BWK End date of Month"; Rec."BWK End date of Month")
                 {
                     ApplicationArea = All;
                 }
+
                 field("BWK Year-Month"; Rec."BWK Year-Month")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                 }
+
                 field("BWK Month No."; Rec."BWK Month No.")
                 {
                     ApplicationArea = All;
                 }
+
                 field("BWK Month Name"; Rec."BWK Month Name")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                 }
+
                 field("BWK Year No."; Rec."BWK Year No.")
                 {
                     ApplicationArea = All;
@@ -60,19 +65,31 @@ page 94003 "BWK E-Tax Card"
                         Editable = false;
                         ApplicationArea = all;
                     }
+
                     field("BWK Total VAT Amount"; Rec."BWK Total VAT Amount")
                     {
                         Editable = false;
                         ApplicationArea = all;
                     }
+
                     field("BWK Total Amount Incl. VAT"; Rec."BWK Total Amount Incl. VAT")
                     {
                         Editable = false;
                         ApplicationArea = all;
                     }
 
+                    field("BWK Etax Total List Line"; Rec."BWK Etax Total List Line")
+                    {
+                        ApplicationArea = all;
+                    }
+
+                    field("BWK Etax Total Export file"; Rec."BWK Etax Total Export file")
+                    {
+                        ApplicationArea = all;
+                    }
                 }
             }
+
             part("BWK ETaxSubpage"; "BWK E-Tax Subpage")
             {
                 SubPageView = sorting("BWK E-Tax Document Type", "BWK End date of Month", "BWK Source Table", "BWK Document No.");
@@ -82,27 +99,9 @@ page 94003 "BWK E-Tax Card"
                 Editable = Rec."BWK Status Lock" = false;
                 Caption = 'E-Tax Subpage';
             }
+
             group("E-Tax Total")
             {
-                field("BWK Etax Total List Line"; Rec."BWK Etax Total List Line")
-                {
-                    ApplicationArea = all;
-                }
-
-                field("BWK Etax Total Export file"; Rec."BWK Etax Total Export file")
-                {
-                    ApplicationArea = all;
-                }
-
-                // field("BWK Etax Total Send file"; Rec."BWK Etax Total Send file")
-                // {
-                //     ApplicationArea = all;
-                // }
-
-                // field("BWK Etax Total Sign file"; Rec."BWK Etax Total Sign file")
-                // {
-                //     ApplicationArea = all;
-                // }
 
             }
         }
@@ -110,38 +109,12 @@ page 94003 "BWK E-Tax Card"
     }
     actions
     {
-        area(Reporting)
-        {
-            // action("BWK Sales Vat Report")
-            // {
-            //     Caption = 'รายงานภาษีขาย';
-            //     ApplicationArea = all;
-            //     Promoted = true;
-            //     PromotedCategory = Report;
-            //     PromotedIsBig = true;
-            //     Image = PrintVAT;
-            //     trigger OnAction()
-            //     var
-            //         TaxReportHeader: Record "BWK Tax Report Header";
-            //         ReportSalesVat: Report "BWK Sales Vat";
-            //     begin
-
-            //         Clear(ReportSalesVat);
-            //         TaxReportHeader.Reset();
-            //         TaxReportHeader.SetRange("BWK Tax Type", Rec."BWK Tax Type");
-            //         TaxReportHeader.SetRange("BWK Document No.", Rec."BWK Document No.");
-            //         TaxReportHeader.FindFirst();
-            //         ReportSalesVat.SetTableView(TaxReportHeader);
-            //         ReportSalesVat.Run();
-            //         Clear(ReportSalesVat);
-            //     end;
-            // }
-        }
         area(Processing)
         {
             group("BWK Function")
             {
                 Caption = '&Function';
+
                 action("BWK Lock")
                 {
                     Caption = 'Lock';
@@ -155,6 +128,7 @@ page 94003 "BWK E-Tax Card"
                         Rec."BWK Status Lock" := true;
                     end;
                 }
+
                 action("BWK UnLock")
                 {
                     Caption = 'UnLock';
@@ -163,11 +137,13 @@ page 94003 "BWK E-Tax Card"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Image = UnApply;
+
                     trigger OnAction()
                     begin
                         Rec."BWK Status Lock" := false;
                     end;
                 }
+
                 action("BWK Genarate Line")
                 {
                     Caption = 'Generate Line';
@@ -176,6 +152,7 @@ page 94003 "BWK E-Tax Card"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Image = UnApply;
+
                     trigger OnAction()
                     var
 
@@ -843,31 +820,6 @@ page 94003 "BWK E-Tax Card"
                         CurrPage.Update(true);
                     end;
                 }
-                // action(UpdateData)
-                // {
-                //     Caption = 'Update Data';
-                //     Image = UpdateDescription;
-                //     Promoted = true;
-                //     PromotedCategory = Process;
-
-                //     trigger OnAction()
-                //     var
-                //         vatEntry: Record "VAT Entry";
-                //     begin
-                //         vatEntry.Reset();
-                //         vatEntry.SetFilter("Document No.", '%1|%2', 'DR23100001', 'DR23110001');
-                //         if vatEntry.FindSet() then begin
-                //             repeat
-                //                 vatEntry."BWK Export File E-TAX" := false;
-                //                 vatEntry."Document Type" := vatEntry."Document Type"::Invoice;
-                //                 vatEntry."BWK Document Type" := vatEntry."BWK Document Type"::" ";
-                //                 vatEntry."BWK End date of Month" := 0D;
-                //                 vatEntry.Modify();
-                //             until vatEntry.Next() = 0;
-                //             Message('Success');
-                //         end;
-                //     end;
-                // }
             }
         }
     }

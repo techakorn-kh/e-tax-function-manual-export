@@ -80,16 +80,17 @@ page 94002 "BWK E-Tax Lists"
                         LDateEndDateOfMonth, LDateEndDateOfMonth2 : Date;
                         LPageETaxCard: Page "BWK E-Tax Card";
                     begin
-                        if Rec."BWK E-Tax Document Type" = Rec."BWK E-Tax Document Type"::" " then
+                        if Rec."BWK E-Tax Document Type" = Rec."BWK E-Tax Document Type"::" " then begin
                             Error('Document Type must not be blank value.');
+                        end;
 
                         if Confirm('Do you confirm create E-Tax next month?', false) then begin
                             LRecETaxHeader.Reset();
                             LRecETaxHeader.SetFilter("BWK E-Tax Document Type", '%1', Rec."BWK E-Tax Document Type");
+
                             If not LRecETaxHeader.FindLast() then begin
                                 LDateEndDateOfMonth := CalcDate('CM', Today);
-                            end
-                            else begin
+                            end else begin
                                 LDateEndDateOfMonth := CalcDate('CM+1M', LRecETaxHeader."BWK End date of Month");
                             end;
 

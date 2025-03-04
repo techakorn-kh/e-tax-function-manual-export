@@ -121,9 +121,9 @@ codeunit 94000 "BWK E-Tax Function Center"
         + '.txt';
 
         GenLedSet.Get();
-        GenLedSet.TestField("BWK Etax Path Text File");
+        GenLedSet.TestField("BWK Export text file");
 
-        Route := GenLedSet."BWK Etax Path Text File" + Format(EtaxLine."BWK E-Tax Document Type") + '\' + FILE_NAME;
+        Route := GenLedSet."BWK Export text file" + Format(EtaxLine."BWK E-Tax Document Type") + '\' + FILE_NAME;
 
         if (DocNo = '') or (DocNo <> Etaxline."BWK Document No.") then begin
             FileGen.Create(Route, TextEncoding::UTF8);
@@ -1544,12 +1544,12 @@ codeunit 94000 "BWK E-Tax Function Center"
 
         GenLedSet.Get();
         CompanyInfo.Get;
-        GenLedSet.TestField("BWK Etax Path PDF File");
+        GenLedSet.TestField("BWK Export pdf file");
 
         if (DocNo = '') or (DocNo <> Etaxline."BWK Document No.") then begin
             LETaxLine.Reset();
             LETaxLine.SetRange("BWK E-Tax Document Type", EtaxLine."BWK E-Tax Document Type");
-            LETaxLine.SetRange("BWK Etax Select Export File", EtaxLine."BWK Etax Select Export File");
+            LETaxLine.SetRange("BWK Etax Select", EtaxLine."BWK Etax Select");
             LETaxLine.SetRange("BWK End date of Month", EtaxLine."BWK End date of Month");
             if LETaxLine.FindSet() then begin
                 FILE_NAME := Format(EtaxLine."BWK E-Tax Document Type")
@@ -1558,7 +1558,7 @@ codeunit 94000 "BWK E-Tax Function Center"
                 + '_' + Format(EtaxLine."BWK Document No.")
                 + '.pdf';
 
-                Route := GenLedSet."BWK Etax Path PDF File" + Format(EtaxLine."BWK E-Tax Document Type") + '\' + FILE_NAME;
+                Route := GenLedSet."BWK Export pdf file" + Format(EtaxLine."BWK E-Tax Document Type") + '\' + FILE_NAME;
 
                 repeat
                     case LETaxLine."BWK Source Table" of
@@ -1651,10 +1651,10 @@ codeunit 94000 "BWK E-Tax Function Center"
                                     PostedGenJnlLine.SetRange("BWK Deposit", true);
                                     if PostedGenJnlLine.FindFirst() then begin
                                         GenLedSet2.Reset();
-                                        GenLedSet2.SetFilter("BWK Etax Rec Deposit Form ID", '<>%1', 0);
+                                        GenLedSet2.SetFilter("BWK Etax Rcp Deposit Form ID", '<>%1', 0);
                                         if GenLedSet2.FindFirst() then begin
-                                            if GenLedSet2."BWK Etax Rec Deposit Form ID" <> 0 then begin
-                                                Report.SaveAsPdf(GenLedSet2."BWK Etax Rec Deposit Form ID", Route, PostedGenJnlLine);
+                                            if GenLedSet2."BWK Etax Rcp Deposit Form ID" <> 0 then begin
+                                                Report.SaveAsPdf(GenLedSet2."BWK Etax Rcp Deposit Form ID", Route, PostedGenJnlLine);
                                             end else begin
                                                 Error('Please input Form Setup ID on General Ledger Setup.');
                                                 exit(false);

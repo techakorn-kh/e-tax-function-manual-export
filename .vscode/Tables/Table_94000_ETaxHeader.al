@@ -117,8 +117,8 @@ table 94000 "BWK E-Tax Header"
         {
             Caption = 'Total Export file';
             // Editable = false;
-            CalcFormula = count("BWK E-Tax Line" where("BWK Etax Export Text File" = const(true),
-                                                    "BWK Etax Export PDF File" = const(true),
+            CalcFormula = count("BWK E-Tax Line" where("BWK Etax Text File" = const(true),
+                                                    "BWK Etax PDF File" = const(true),
                                                     "BWK E-Tax Document Type" = field("BWK E-Tax Document Type"),
                                                     "BWK End date of Month" = FIELD("BWK End date of Month")));
             FieldClass = FlowField;
